@@ -139,7 +139,7 @@ def _parse_lrc(lrc: str) -> list:
 # ── frame renderer ────────────────────────────────────────────────────────────
 
 def _render_frame(lyrics: list, t: float, max_w: float, max_h: float,
-                  start_size: int, watermark: str = "@geldmaker") -> bytes:
+                  start_size: int, watermark: str = "@cashroll") -> bytes:
     img  = Image.new("RGB", (W, H), BG)
     draw = ImageDraw.Draw(img)
 
@@ -184,7 +184,7 @@ def _render_frame(lyrics: list, t: float, max_w: float, max_h: float,
 # ── pipeline ──────────────────────────────────────────────────────────────────
 
 def render_video(lyrics: list, audio_path: Path, output_path: Path,
-                 watermark: str = "@geldmaker") -> None:
+                 watermark: str = "@cashroll") -> None:
     total   = lyrics[-1][1] + 1.0      # end of last line + 1s
     frames  = int(total * FPS)
     max_w   = W * MAX_W_RATIO
@@ -215,7 +215,7 @@ def render_video(lyrics: list, audio_path: Path, output_path: Path,
 
 
 def run(music_path: Path, output_path: Path, model_size: str = "base",
-        artist: str = "", watermark: str = "@geldmaker") -> None:
+        artist: str = "", watermark: str = "@cashroll") -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     music_path = Path(music_path)
 

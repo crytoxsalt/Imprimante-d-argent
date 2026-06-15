@@ -211,7 +211,7 @@ def main():
     br.add_argument("music_path", help="Path to music file (MP3, WAV, etc.)")
     br.add_argument("--model", default="base", help="Whisper model size (default: base)")
     br.add_argument("--artist", default="", help="Artist name to improve LRCLIB search")
-    br.add_argument("--watermark", default="@geldmaker", help="Text shown during silence (default: @geldmaker)")
+    br.add_argument("--watermark", default="@cashroll", help="Text shown during silence (default: @cashroll)")
 
     # --- movies ---
     mv = sub.add_parser("movies", help="Portrait movie clip with burned-in subtitles")

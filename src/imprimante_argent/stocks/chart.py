@@ -58,7 +58,7 @@ def _mk_ann(ax, color):
 
 
 def dca_chart_frames(df: pd.DataFrame, ticker_name: str, n_frames: int,
-                     fps: int = 24, watermark: str = "@geldmaker"):
+                     fps: int = 24, watermark: str = "@cashroll"):
     """
     Draw the DCA chart progressively across the FULL video duration.
     Each frame reveals a bit more data. Dynamic xlim/ylim expand with data.
@@ -135,7 +135,7 @@ def comparison_chart_frames(
     ticker_names: dict[str, str],
     n_frames: int,
     fps: int = 24,
-    watermark: str = "@geldmaker",
+    watermark: str = "@cashroll",
 ):
     """
     Draw all comparison lines progressively across the full video duration.

@@ -20,5 +20,5 @@ GAMEPLAY_DIR = ASSETS_DIR / "gameplay"
 
 TTS_VOICE = "en-US-AriaNeural"
 WHISPER_MODEL = "base"
-TITLECARD_AUTHOR = "Requestedreads"
+TITLECARD_AUTHOR = "Cashroll"
 TITLECARD_DURATION = 4.0
