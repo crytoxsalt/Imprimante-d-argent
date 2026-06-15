@@ -98,10 +98,18 @@ def _search_lrclib(query: str) -> Optional[str]:
     try:
         with urllib.request.urlopen(url, timeout=10) as r:
             results = json.loads(r.read())
-        for item in results:
-            if item.get("syncedLyrics"):
-                print(f"  LRCLIB: {item.get('artistName')} – {item.get('trackName')}")
-                return item["syncedLyrics"]
+        q_words = set(query.lower().split())
+        def score(item):
+            title = (item.get("trackName") or "").lower()
+            return sum(1 for w in q_words if w in title)
+        ranked = sorted(
+            [i for i in results if i.get("syncedLyrics")],
+            key=score, reverse=True,
+        )
+        if ranked:
+            best = ranked[0]
+            print(f"  LRCLIB: {best.get('artistName')} - {best.get('trackName')}")
+            return best["syncedLyrics"]
     except Exception as e:
         print(f"  LRCLIB failed: {e}")
     return None
@@ -215,13 +223,16 @@ def render_video(lyrics: list, audio_path: Path, output_path: Path,
 
 
 def run(music_path: Path, output_path: Path, model_size: str = "base",
-        artist: str = "", watermark: str = "@geldmaker") -> None:
+        artist: str = "", watermark: str = "@geldmaker",
+        whisper: bool = False) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     music_path = Path(music_path)
 
-    query = f"{artist} {music_path.stem}".strip()
-    print(f"Searching LRCLIB for '{query}'...")
-    lrc = _search_lrclib(query)
+    lrc = None
+    if not whisper:
+        query = f"{artist} {music_path.stem}".strip()
+        print(f"Searching LRCLIB for '{query}'...")
+        lrc = _search_lrclib(query)
     if not lrc:
         lrc = _transcribe(music_path, model_size)
 

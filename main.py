@@ -72,6 +72,7 @@ def cmd_familyguy(args):
             max_dur=float(args.duration),
             part_label=f"Part {part}",
             srt_path=srt_path,
+            clip_offset=float(part_start),
         )
         print()
 
@@ -100,7 +101,7 @@ def cmd_brat(args):
     if not music_path.exists():
         sys.exit(f"Music file not found: {music_path}")
     out = config.OUTPUT_DIR / f"brat_{int(time.time())}.mp4"
-    run(music_path, out, model_size=args.model, artist=args.artist, watermark=args.watermark)
+    run(music_path, out, model_size=args.model, artist=args.artist, watermark=args.watermark, whisper=args.whisper)
 
 
 def cmd_movies(args):
@@ -212,6 +213,7 @@ def main():
     br.add_argument("--model", default="base", help="Whisper model size (default: base)")
     br.add_argument("--artist", default="", help="Artist name to improve LRCLIB search")
     br.add_argument("--watermark", default="@geldmaker", help="Text shown during silence (default: @geldmaker)")
+    br.add_argument("--whisper", action="store_true", help="Skip LRCLIB and use Whisper directly")
 
     # --- movies ---
     mv = sub.add_parser("movies", help="Portrait movie clip with burned-in subtitles")

@@ -93,7 +93,7 @@ def _parse_srt(path: Path) -> list:
 
 
 def compose(tv_clip, gameplay_clip, output_path, min_dur=30.0, max_dur=90.0,
-            part_label=None, srt_path=None):
+            part_label=None, srt_path=None, clip_offset=0.0):
     config.TEMP_DIR.mkdir(parents=True, exist_ok=True)
     config.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -109,13 +109,14 @@ def compose(tv_clip, gameplay_clip, output_path, min_dur=30.0, max_dur=90.0,
 
     if srt_path and Path(srt_path).exists():
         # Use VidVault SRT — no Whisper needed
+        # SRT timestamps are episode-absolute; shift by clip_offset (download start) + tv_start
         print("Loading captions from SRT...")
-        raw_words = _parse_srt(srt_path)
-        # Shift timestamps to match the segment start offset
+        raw_words  = _parse_srt(srt_path)
+        abs_start  = clip_offset + tv_start
         words = [
-            {"word": e["word"], "start": e["start"] - tv_start, "end": e["end"] - tv_start}
+            {"word": e["word"], "start": e["start"] - abs_start, "end": e["end"] - abs_start}
             for e in raw_words
-            if e["end"] > tv_start and e["start"] < tv_start + duration
+            if e["end"] > abs_start and e["start"] < abs_start + duration
         ]
         print(f"  {len(words)} subtitle lines")
     else:
@@ -159,19 +160,34 @@ def compose(tv_clip, gameplay_clip, output_path, min_dur=30.0, max_dur=90.0,
     )
 
     print("Composing split-screen video...")
+    use_srt = srt_path and Path(srt_path).exists()
     try:
-        subprocess.run([
-            "ffmpeg", "-y",
-            "-ss", str(tv_start),  "-t", str(duration), "-i", str(tv_clip),
-            "-ss", str(gta_start), "-t", str(duration), "-i", str(gameplay_clip),
-            "-i", str(audio_path),
-            "-filter_complex", filt,
-            "-map", "[outv]",
-            "-map", "2:a",
-            "-c:v", "libx264", "-crf", "23", "-preset", "fast",
-            "-c:a", "aac", "-b:a", "192k",
-            str(output_path),
-        ], check=True)
+        if use_srt:
+            # Audio comes from TV clip input (0:a) — no separate audio file needed
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-ss", str(tv_start),  "-t", str(duration), "-i", str(tv_clip),
+                "-ss", str(gta_start), "-t", str(duration), "-i", str(gameplay_clip),
+                "-filter_complex", filt,
+                "-map", "[outv]",
+                "-map", "0:a",
+                "-c:v", "libx264", "-crf", "23", "-preset", "fast",
+                "-c:a", "aac", "-b:a", "192k",
+                str(output_path),
+            ], check=True)
+        else:
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-ss", str(tv_start),  "-t", str(duration), "-i", str(tv_clip),
+                "-ss", str(gta_start), "-t", str(duration), "-i", str(gameplay_clip),
+                "-i", str(audio_path),
+                "-filter_complex", filt,
+                "-map", "[outv]",
+                "-map", "2:a",
+                "-c:v", "libx264", "-crf", "23", "-preset", "fast",
+                "-c:a", "aac", "-b:a", "192k",
+                str(output_path),
+            ], check=True)
     finally:
         shutil.rmtree(config.TEMP_DIR, ignore_errors=True)
 
