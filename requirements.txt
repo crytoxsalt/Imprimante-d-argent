@@ -1,0 +1,15 @@
+requests
+curl_cffi
+edge-tts
+faster-whisper
+ffmpeg-python
+pillow
+python-dotenv
+yfinance
+matplotlib
+pandas
+librosa
+numpy
+transformers
+torch
+sentencepiece

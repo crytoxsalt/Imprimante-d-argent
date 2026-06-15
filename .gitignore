@@ -1,0 +1,24 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+temp/
+output/
+
+.pytest_cache/
+.mypy_cache/
+
+# Large media assets (not in repo — add your own locally)
+assets/gameplay/
+assets/lifestyle/
+assets/episodes/
+assets/music/
+assets/rwj/
+assets/base.mp4
+
+# Stray downloads
+*.crdownload
+*.zip
+*.mp3
