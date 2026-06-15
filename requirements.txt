@@ -13,3 +13,4 @@ numpy
 transformers
 torch
 sentencepiece
+tiktok-uploader
